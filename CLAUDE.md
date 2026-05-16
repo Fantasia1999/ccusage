@@ -8,6 +8,7 @@ This is a monorepo containing multiple packages. For package-specific guidance, 
 
 - **Main CLI Package**: @apps/ccusage/CLAUDE.md - Core ccusage CLI tool and library
 - **Codex CLI Package**: @apps/codex/CLAUDE.md - OpenAI Codex usage tracking CLI
+- **Copilot CLI Package**: @apps/copilot/ - GitHub Copilot CLI usage tracking CLI (reads `~/.copilot/session-state/<sid>/events.jsonl`)
 - **OpenCode CLI Package**: @apps/opencode/CLAUDE.md - OpenCode usage tracking CLI
 - **Documentation**: @docs/CLAUDE.md - VitePress-based documentation website
 
