@@ -39,11 +39,11 @@ Companion tool for analyzing [OpenCode](https://github.com/opencode-ai/opencode)
 
 ### 🥧 [@ccusage/pi](https://www.npmjs.com/package/@ccusage/pi) - Pi-agent Usage Analyzer
 
-Companion tool for analyzing [pi-agent](https://github.com/badlogic/pi-mono) session usage. Track token usage and costs from your pi-agent sessions with daily, monthly, and session-based reports.
+Companion tool for analyzing [pi-agent](https://github.com/badlogic/pi-mono) session usage. Track token usage and costs from your pi-agent sessions with daily, weekly, monthly, and session-based reports.
 
 ### ⚡ [@ccusage/amp](https://www.npmjs.com/package/@ccusage/amp) - Amp Usage Analyzer
 
-Companion tool for analyzing [Amp](https://ampcode.com/) session usage. Track token usage, costs, and credits from your Amp CLI sessions with daily, monthly, and session-based reports.
+Companion tool for analyzing [Amp](https://ampcode.com/) session usage. Track token usage, costs, and credits from your Amp CLI sessions with daily, weekly, monthly, and session-based reports.
 
 ## Installation
 
@@ -153,6 +153,97 @@ nix develop
 ```
 
 This ensures consistent tooling versions across all contributors and CI systems. The development environment is defined in `flake.nix` and automatically activated via direnv when entering the project directory.
+
+### Running Locally
+
+After cloning the repository, install dependencies once:
+
+```bash
+pnpm install
+```
+
+Run the main Claude Code analyzer from the local workspace:
+
+```bash
+pnpm --filter ccusage start daily
+pnpm --filter ccusage start weekly
+pnpm --filter ccusage start monthly
+pnpm --filter ccusage start session
+pnpm --filter ccusage start blocks
+```
+
+Run companion CLIs from the same checkout:
+
+OpenAI Codex usage:
+
+```bash
+pnpm --filter @ccusage/codex start daily
+pnpm --filter @ccusage/codex start weekly
+pnpm --filter @ccusage/codex start monthly
+pnpm --filter @ccusage/codex start session
+```
+
+GitHub Copilot usage:
+
+```bash
+pnpm --filter @ccusage/copilot start daily
+pnpm --filter @ccusage/copilot start weekly
+pnpm --filter @ccusage/copilot start monthly
+pnpm --filter @ccusage/copilot start session
+```
+
+OpenCode usage:
+
+```bash
+pnpm --filter @ccusage/opencode start daily
+pnpm --filter @ccusage/opencode start weekly
+pnpm --filter @ccusage/opencode start monthly
+pnpm --filter @ccusage/opencode start session
+```
+
+Pi-agent usage:
+
+```bash
+pnpm --filter @ccusage/pi start daily
+pnpm --filter @ccusage/pi start weekly
+pnpm --filter @ccusage/pi start monthly
+pnpm --filter @ccusage/pi start session
+```
+
+Amp usage:
+
+```bash
+pnpm --filter @ccusage/amp start daily
+pnpm --filter @ccusage/amp start weekly
+pnpm --filter @ccusage/amp start monthly
+pnpm --filter @ccusage/amp start session
+```
+
+Common local options work the same way as published commands:
+
+```bash
+pnpm --filter ccusage start daily --json
+pnpm --filter ccusage start monthly --compact
+pnpm --filter ccusage start weekly --since 20250525 --until 20250530
+pnpm --filter ccusage start weekly --start-of-week monday
+pnpm --filter ccusage start daily --breakdown
+pnpm --filter ccusage start blocks --active
+pnpm --filter ccusage start blocks --recent
+
+pnpm --filter @ccusage/codex start daily --json --offline
+pnpm --filter @ccusage/copilot start weekly --json --offline
+pnpm --filter @ccusage/opencode start monthly --json --offline
+pnpm --filter @ccusage/pi start session --json
+pnpm --filter @ccusage/amp start daily --json --compact
+```
+
+Quality checks for local changes:
+
+```bash
+pnpm run format
+pnpm typecheck
+pnpm run test
+```
 
 ## Sponsors
 
