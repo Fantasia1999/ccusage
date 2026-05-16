@@ -26,6 +26,7 @@ This is the main ccusage CLI package that provides usage analysis for Claude Cod
 **Development Usage:**
 
 - `pnpm run start daily` - Show daily usage report
+- `pnpm run start weekly` - Show weekly usage report
 - `pnpm run start monthly` - Show monthly usage report
 - `pnpm run start session` - Show session-based usage report
 - `pnpm run start blocks` - Show 5-hour billing blocks usage report

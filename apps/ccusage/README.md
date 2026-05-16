@@ -27,7 +27,7 @@
 
 ### 📊 [ccusage](https://www.npmjs.com/package/ccusage) - Claude Code Usage Analyzer
 
-The main CLI tool for analyzing Claude Code usage from local JSONL files. Track daily, monthly, and session-based usage with beautiful tables.
+The main CLI tool for analyzing Claude Code usage from local JSONL files. Track daily, weekly, monthly, and session-based usage with beautiful tables.
 
 ### 🤖 [@ccusage/codex](https://www.npmjs.com/package/@ccusage/codex) - OpenAI Codex Usage Analyzer
 
@@ -82,6 +82,7 @@ npx @ccusage/amp@latest         # Amp usage tracking
 # Basic usage
 npx ccusage          # Show daily report (default)
 npx ccusage daily    # Daily token usage and costs
+npx ccusage weekly   # Weekly aggregated report
 npx ccusage monthly  # Monthly aggregated report
 npx ccusage session  # Usage by conversation session
 npx ccusage blocks   # 5-hour billing windows
@@ -92,6 +93,7 @@ npx ccusage daily --since 20250525 --until 20250530
 npx ccusage daily --json  # JSON output
 npx ccusage daily --breakdown  # Per-model cost breakdown
 npx ccusage daily --timezone UTC  # Use UTC timezone
+npx ccusage weekly --start-of-week monday  # Weekly report with Monday as week start
 
 # Project analysis
 npx ccusage daily --instances  # Group by project/instance
@@ -106,6 +108,7 @@ npx ccusage monthly --compact  # Compact monthly report
 ## Features
 
 - 📊 **Daily Report**: View token usage and costs aggregated by date
+- 📅 **Weekly Report**: View token usage and costs aggregated by week
 - 📅 **Monthly Report**: View token usage and costs aggregated by month
 - 💬 **Session Report**: View usage grouped by conversation sessions
 - ⏰ **5-Hour Blocks Report**: Track usage within Claude's billing windows with active block monitoring
@@ -119,7 +122,7 @@ npx ccusage monthly --compact  # Compact monthly report
 - 📸 **Compact Mode**: Use `--compact` flag to force compact table layout, perfect for screenshots and sharing
 - 📋 **Enhanced Model Display**: Model names shown as bulleted lists for better readability
 - 📄 **JSON Output**: Export data in structured JSON format with `--json`
-- 💰 **Cost Tracking**: Shows costs in USD for each day/month/session
+- 💰 **Cost Tracking**: Shows costs in USD for each day/week/month/session
 - 🔄 **Cache Token Support**: Tracks and displays cache creation and cache read tokens separately
 - 🌐 **Offline Mode**: Use pre-cached pricing data without network connectivity with `--offline` (Claude models only)
 - 🏗️ **Multi-Instance Support**: Group usage by project with `--instances` flag and filter by specific projects

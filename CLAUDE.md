@@ -34,15 +34,18 @@ All projects under `apps/` ship as bundled CLIs/binaries. Treat their runtime de
 **Development Usage:**
 
 - `pnpm run start daily` - Show daily usage report
+- `pnpm run start weekly` - Show weekly usage report
 - `pnpm run start monthly` - Show monthly usage report
 - `pnpm run start session` - Show session-based usage report
 - `pnpm run start blocks` - Show 5-hour billing blocks usage report
 - `pnpm run start statusline` - Show compact status line (Beta)
 - `pnpm run start daily --json` - Show daily usage report in JSON format
+- `pnpm run start weekly --json` - Show weekly usage report in JSON format
 - `pnpm run start monthly --json` - Show monthly usage report in JSON format
 - `pnpm run start session --json` - Show session usage report in JSON format
 - `pnpm run start blocks --json` - Show blocks usage report in JSON format
 - `pnpm run start daily --mode <mode>` - Control cost calculation mode (auto/calculate/display)
+- `pnpm run start weekly --mode <mode>` - Control cost calculation mode (auto/calculate/display)
 - `pnpm run start monthly --mode <mode>` - Control cost calculation mode (auto/calculate/display)
 - `pnpm run start session --mode <mode>` - Control cost calculation mode (auto/calculate/display)
 - `pnpm run start blocks --mode <mode>` - Control cost calculation mode (auto/calculate/display)

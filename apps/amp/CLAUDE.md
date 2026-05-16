@@ -36,13 +36,14 @@
 - Treat Amp as a sibling to `apps/ccusage`, `apps/codex`, and `apps/opencode`.
 - Reuse shared packages (`@ccusage/terminal`, `@ccusage/internal`) wherever possible.
 - Amp is packaged as a bundled CLI. Keep every runtime dependency in `devDependencies`.
-- Entry point uses Gunshi framework with subcommands: `daily`, `monthly`, `session`.
+- Entry point uses Gunshi framework with subcommands: `daily`, `weekly`, `monthly`, `session`.
 - Data discovery relies on `AMP_DATA_DIR` environment variable.
 - Default path: `~/.local/share/amp`.
 
 ## Available Commands
 
 - `ccusage-amp daily` - Show daily usage report
+- `ccusage-amp weekly` - Show weekly usage report
 - `ccusage-amp monthly` - Show monthly usage report
 - `ccusage-amp session` - Show usage by thread (session)
 - Add `--json` flag for JSON output format

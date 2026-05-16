@@ -97,6 +97,25 @@ export function formatDisplayMonth(monthKey: string): string {
 	return formatter.format(date);
 }
 
+export function toWeekKey(timestamp: string, timezone?: string): string {
+	const dateKey = toDateKey(timestamp, timezone);
+	const [yearStr = '0', monthStr = '1', dayStr = '1'] = dateKey.split('-');
+	const date = new Date(
+		Date.UTC(
+			Number.parseInt(yearStr, 10),
+			Number.parseInt(monthStr, 10) - 1,
+			Number.parseInt(dayStr, 10),
+		),
+	);
+	const day = date.getUTCDay();
+	date.setUTCDate(date.getUTCDate() - day);
+	return date.toISOString().slice(0, 10);
+}
+
+export function formatDisplayWeek(weekKey: string): string {
+	return formatDisplayDate(weekKey);
+}
+
 export function formatDisplayDateTime(timestamp: string, timezone?: string): string {
 	const tz = safeTimeZone(timezone);
 	const date = new Date(timestamp);

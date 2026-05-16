@@ -28,6 +28,9 @@ This package provides usage tracking for pi-agent.
 # Show daily pi-agent usage
 ccusage-pi daily
 
+# Show weekly pi-agent usage
+ccusage-pi weekly
+
 # Show monthly pi-agent usage
 ccusage-pi monthly
 
@@ -54,7 +57,7 @@ This package reads usage data from pi-agent only.
 - `src/index.ts` - CLI entry point with Gunshi-based command routing
 - `src/data-loader.ts` - Loads and aggregates pi-agent JSONL data
 - `src/_pi-agent.ts` - Pi-agent data parsing and transformation
-- `src/commands/` - CLI subcommands (daily, monthly, session)
+- `src/commands/` - CLI subcommands (daily, weekly, monthly, session)
 
 ## Dependencies
 

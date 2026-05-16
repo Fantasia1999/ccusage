@@ -80,6 +80,25 @@ export type MonthlyUsageWithSource = {
 	}>;
 };
 
+export type WeeklyUsageWithSource = {
+	week: string;
+	source: Source;
+	inputTokens: number;
+	outputTokens: number;
+	cacheCreationTokens: number;
+	cacheReadTokens: number;
+	totalCost: number;
+	modelsUsed: string[];
+	modelBreakdowns: Array<{
+		modelName: string;
+		inputTokens: number;
+		outputTokens: number;
+		cacheCreationTokens: number;
+		cacheReadTokens: number;
+		cost: number;
+	}>;
+};
+
 async function processJSONLFileByLine(
 	filePath: string,
 	processor: (line: string) => Promise<void> | void,
@@ -121,6 +140,21 @@ function formatMonth(timestamp: string, timezone?: string): string {
 	const tz = timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
 	const formatted = date.toLocaleDateString('en-CA', { timeZone: tz });
 	return formatted.slice(0, 7);
+}
+
+function formatWeek(timestamp: string, timezone?: string): string {
+	const date = formatDate(timestamp, timezone);
+	const [yearStr = '0', monthStr = '1', dayStr = '1'] = date.split('-');
+	const weekStart = new Date(
+		Date.UTC(
+			Number.parseInt(yearStr, 10),
+			Number.parseInt(monthStr, 10) - 1,
+			Number.parseInt(dayStr, 10),
+		),
+	);
+	const day = weekStart.getUTCDay();
+	weekStart.setUTCDate(weekStart.getUTCDate() - day);
+	return weekStart.toISOString().slice(0, 10);
 }
 
 function normalizeDate(value: string): string {
@@ -420,6 +454,46 @@ export async function loadPiAgentMonthlyData(
 
 	const order = options?.order ?? 'desc';
 	results.sort((a, b) => compareStringsByOrder(a.month, b.month, order));
+
+	return results;
+}
+
+export async function loadPiAgentWeeklyData(
+	options?: LoadOptions,
+): Promise<WeeklyUsageWithSource[]> {
+	const entries = await loadPiAgentData(options);
+
+	const grouped = new Map<string, EntryData[]>();
+	for (const entry of entries) {
+		const week = formatWeek(entry.timestamp, options?.timezone);
+		const date = formatDate(entry.timestamp, options?.timezone);
+		if (!isInDateRange(date, options?.since, options?.until)) {
+			continue;
+		}
+
+		const existing = grouped.get(week) ?? [];
+		existing.push(entry);
+		grouped.set(week, existing);
+	}
+
+	const results: WeeklyUsageWithSource[] = [];
+	for (const [week, weekEntries] of grouped) {
+		const modelMap = aggregateByModel(weekEntries);
+		const totals = calculateTotals(weekEntries);
+		const modelsUsed = Array.from(modelMap.keys());
+		const modelBreakdowns = createBreakdowns(modelMap);
+
+		results.push({
+			week,
+			source: 'pi-agent',
+			...totals,
+			modelsUsed,
+			modelBreakdowns,
+		});
+	}
+
+	const order = options?.order ?? 'desc';
+	results.sort((a, b) => compareStringsByOrder(a.week, b.week, order));
 
 	return results;
 }

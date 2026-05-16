@@ -140,6 +140,32 @@ describe('ccusage output snapshots', () => {
 		);
 	});
 
+	it('matches weekly table output', async () => {
+		const tempDir = path.join(tmpdir(), 'ccusage-cli-output-fixtures');
+		await mkdir(tempDir, { recursive: true });
+		await using fixture = await createFixture(fixtureTemplatePath, { tempDir });
+
+		const result = spawnSync('bun', ['./src/index.ts', 'weekly', '--offline'], {
+			cwd: appRoot,
+			encoding: 'utf8',
+			env: {
+				CLAUDE_CONFIG_DIR: fixture.path,
+				COLUMNS: '200',
+				LOG_LEVEL: '3',
+				NO_COLOR: '1',
+				PATH: process.env.PATH,
+				TZ: 'UTC',
+			},
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stderr).toBe('');
+		await mkdir(snapshotRoot, { recursive: true });
+		await expect(result.stdout.replace(/\n$/, '')).toMatchFileSnapshot(
+			path.join(snapshotRoot, 'weekly-table.txt'),
+		);
+	});
+
 	it('matches daily table output', async () => {
 		const tempDir = path.join(tmpdir(), 'ccusage-cli-output-fixtures');
 		await mkdir(tempDir, { recursive: true });

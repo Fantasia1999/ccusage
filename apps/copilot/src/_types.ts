@@ -34,6 +34,13 @@ export type MonthlyUsageSummary = {
 	models: Map<string, ModelUsage>;
 } & TokenUsageDelta;
 
+export type WeeklyUsageSummary = {
+	week: string;
+	firstTimestamp: string;
+	costUSD: number;
+	models: Map<string, ModelUsage>;
+} & TokenUsageDelta;
+
 export type SessionUsageSummary = {
 	sessionId: string;
 	directory: string;
@@ -69,6 +76,19 @@ export type DailyReportRow = {
 
 export type MonthlyReportRow = {
 	month: string;
+	inputTokens: number;
+	cachedInputTokens: number;
+	cacheCreationInputTokens: number;
+	outputTokens: number;
+	reasoningOutputTokens: number;
+	totalTokens: number;
+	premiumRequests: number;
+	costUSD: number;
+	models: Record<string, ModelUsage>;
+};
+
+export type WeeklyReportRow = {
+	week: string;
 	inputTokens: number;
 	cachedInputTokens: number;
 	cacheCreationInputTokens: number;
