@@ -175,10 +175,13 @@ export async function loadTokenUsageEvents(options: LoadOptions = {}): Promise<L
 
 			const lines = fileContentResult.value.split(/\r?\n/);
 
-			let latestShutdown: {
-				timestamp: string;
-				metrics: Map<string, TokenUsageEvent>;
-			} | null = null;
+			const latestShutdownByModel = new Map<
+				string,
+				{
+					timestamp: string;
+					event: TokenUsageEvent;
+				}
+			>();
 
 			// Fallback aggregation: per-model output-token sums.
 			const fallbackByModel = new Map<string, { outputTokens: number; lastTimestamp: string }>();
@@ -213,7 +216,6 @@ export async function loadTokenUsageEvents(options: LoadOptions = {}): Promise<L
 						continue;
 					}
 
-					const metricsMap = new Map<string, TokenUsageEvent>();
 					for (const [model, raw] of Object.entries(shutdown.output.modelMetrics)) {
 						const usage = raw.usage ?? {};
 						const requests = raw.requests ?? {};
@@ -235,7 +237,7 @@ export async function loadTokenUsageEvents(options: LoadOptions = {}): Promise<L
 							continue;
 						}
 
-						metricsMap.set(model, {
+						const event = {
 							sessionId,
 							directory: workspaceCwd,
 							timestamp,
@@ -247,14 +249,11 @@ export async function loadTokenUsageEvents(options: LoadOptions = {}): Promise<L
 							reasoningOutputTokens: reasoning,
 							totalTokens: inputTokens + outputTokens,
 							premiumRequests: cost,
-						});
-					}
-					// Keep the latest shutdown for the session (in case of duplicates).
-					if (
-						metricsMap.size > 0 &&
-						(latestShutdown == null || timestamp >= latestShutdown.timestamp)
-					) {
-						latestShutdown = { timestamp, metrics: metricsMap };
+						};
+						const existing = latestShutdownByModel.get(model);
+						if (existing == null || timestamp >= existing.timestamp) {
+							latestShutdownByModel.set(model, { timestamp, event });
+						}
 					}
 					continue;
 				}
@@ -284,8 +283,8 @@ export async function loadTokenUsageEvents(options: LoadOptions = {}): Promise<L
 				}
 			}
 
-			if (latestShutdown != null) {
-				for (const event of latestShutdown.metrics.values()) {
+			if (latestShutdownByModel.size > 0) {
+				for (const { event } of latestShutdownByModel.values()) {
 					events.push(event);
 				}
 			} else if (options.includeIncomplete === true && fallbackByModel.size > 0) {
@@ -405,6 +404,66 @@ if (import.meta.vitest != null) {
 			expect(events).toHaveLength(1);
 			expect(events[0]!.inputTokens).toBe(300);
 			expect(events[0]!.premiumRequests).toBe(3);
+		});
+
+		it('keeps prior model usage when the last shutdown only reports the new model', async () => {
+			await using fixture = await createFixture({
+				'state/switched': {
+					'events.jsonl': [
+						JSON.stringify({
+							type: 'session.shutdown',
+							timestamp: '2026-05-16T06:10:00.000Z',
+							data: {
+								modelMetrics: {
+									'claude-opus-4.7': {
+										usage: { inputTokens: 1_000, outputTokens: 100 },
+										requests: { count: 4, cost: 15 },
+									},
+								},
+							},
+						}),
+						JSON.stringify({
+							type: 'session.model_change',
+							timestamp: '2026-05-16T06:15:00.000Z',
+							data: {
+								previousModel: 'claude-opus-4.7',
+								newModel: 'claude-sonnet-4.6',
+							},
+						}),
+						JSON.stringify({
+							type: 'session.shutdown',
+							timestamp: '2026-05-16T06:20:00.000Z',
+							data: {
+								modelMetrics: {
+									'claude-opus-4.7': {
+										usage: { inputTokens: 0, outputTokens: 0 },
+										requests: { count: 0, cost: 0 },
+									},
+									'claude-sonnet-4.6': {
+										usage: { inputTokens: 200, outputTokens: 20 },
+										requests: { count: 1, cost: 2 },
+									},
+								},
+							},
+						}),
+					].join('\n'),
+				},
+			});
+
+			const { events } = await loadTokenUsageEvents({
+				sessionDirs: [fixture.getPath('state')],
+			});
+			expect(events).toHaveLength(2);
+			expect(events.map((event) => event.model).sort()).toEqual([
+				'claude-opus-4.7',
+				'claude-sonnet-4.6',
+			]);
+			const opus = events.find((event) => event.model === 'claude-opus-4.7');
+			const sonnet = events.find((event) => event.model === 'claude-sonnet-4.6');
+			expect(opus?.inputTokens).toBe(1_000);
+			expect(opus?.premiumRequests).toBe(15);
+			expect(sonnet?.inputTokens).toBe(200);
+			expect(sonnet?.premiumRequests).toBe(2);
 		});
 
 		it('skips incomplete sessions by default and includes them with --include-incomplete', async () => {
